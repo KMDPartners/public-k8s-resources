@@ -1,0 +1,21 @@
+name: PR Notification
+
+on:
+  pull_request:
+    types: [ opened, reopened, ready_for_review ]
+
+jobs:
+  pr-notification:
+    name: Notify PE Internal Slack channel about PR
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Slack PR Notification
+        uses: KMDPartners/gha-shared/.github/actions/pr-notification@trunk
+        with:
+          webhook: ${{ secrets.ORG_PE_INTERNAL_CHANNEL_WEBHOOK }}
+          message_title: ':bell: Public K8s Resources PR Ready for Review :bell:'
+          message: '${{ github.event.pull_request.title }}: ${{ github.event.pull_request.html_url }}'
+          slack_user_name: 'PE GHA Notifications'
